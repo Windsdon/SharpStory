@@ -44,11 +44,13 @@ namespace Continue {
                 }
                 println("§1Esperando cliente...");
                 try {
+                    Random random = new Random();
                     TcpClient serverClient = listener.AcceptTcpClient();
                     NetworkStream stream = serverClient.GetStream();
 
                     println("Testando conexão");
-                    var testMessage = Encoding.ASCII.GetBytes("hello");
+                    string testStr = random.Next(0, 99999).ToString();
+                    var testMessage = Encoding.ASCII.GetBytes(testStr);
 
                     stream.Write(testMessage, 0, testMessage.Length);
 
@@ -56,6 +58,17 @@ namespace Continue {
                     string received = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
 
                     printf("§3Resposta: {0}\n", new object[] { received });
+
+                    if (received == testStr) {
+                        println("§3Teste efetuado com sucesso.§1\nPressione qualquer tecla para iniciar.");
+                        Console.In.Read();
+                        Console.Clear();
+                        while(true){
+                            println("§3Sua vez: ");
+                        }
+                    } else {
+                        println("§2Teste falhou.");
+                    }
                 } catch (SocketException e) {
                     printf("§2Falhou: {0}\n", new object[] { e.Message });
                 }
@@ -73,7 +86,7 @@ namespace Continue {
                     int bytesReceived = stream.Read(buffer, 0, buffer.Length);
                     string received = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
 
-                    printf("§3Recebido: {0}\n\nEnviando de volta\n", new object[] { received });
+                    printf("§3Recebido:§r {0}\nEnviando de volta\n", new object[] { received });
 
                     var testMessage = Encoding.ASCII.GetBytes(received);
                     stream.Write(testMessage, 0, testMessage.Length);
